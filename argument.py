@@ -120,6 +120,7 @@ parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
 parser.add_argument('--weight-decay', '--wd', default=5e-4, type=float, help='weight decay')
 parser.add_argument('--seed', default=0, type=int, help='random seed for training')
 parser.add_argument('--pretrained', action='store_true')
+parser.add_argument('--num-intervals', type=int, default=5)
 
 # Mixup
 parser.add_argument('--mixup',
