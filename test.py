@@ -407,6 +407,48 @@ def test_data(args,
             f'Repeat {repeat} => Best, last acc: {np.mean(best_acc_l):.1f} {np.mean(acc_l):.1f}\n')
 
 
+def test_data_with_previous(args,
+              train_loader,
+              val_loader,
+              previous_train_loaders,
+              test_resnet=False,
+              model_fn=None,
+              repeat=1,
+              logger=print,
+              num_val=4):
+    """Train neural networks on condensed data
+    """
+
+    args.epoch_print_freq = args.epochs // num_val
+
+    if model_fn is None:
+        model_fn_ls = [define_model]
+        if test_resnet:
+            model_fn_ls = [resnet10_bn]
+    else:
+        model_fn_ls = [model_fn]
+    
+    for model_fn in model_fn_ls:
+        best_acc_l = []
+        acc_l = []
+        best_accs_repeat = []
+        for _ in range(repeat):
+            best_accs = []
+            model = model_fn(args, args.nclass, logger=logger)
+            for previous_train_loader in previous_train_loaders:
+                best_acc, acc = train(args, model, previous_train_loader, val_loader, logger=print)
+                best_accs.append(best_acc)
+            best_acc, acc = train(args, model, train_loader, val_loader, logger=print)
+            best_acc_l.append(best_acc)
+            best_accs.append(best_acc)
+            best_accs = np.array(best_accs)
+            acc_l.append(acc)
+            torch.save(model.state_dict(), f'model_{_}.pth.tar')
+            best_accs_repeat.append(best_accs)
+        best_accs_repeat = np.stack(best_accs_repeat)
+        logger(
+            f'Repeat {repeat} => Best, last acc: {np.round(np.mean(best_accs_repeat, 0), 4)} {np.mean(acc_l):.1f}\n')
+        
 if __name__ == '__main__':
     from argument import args
     import torch.backends.cudnn as cudnn
