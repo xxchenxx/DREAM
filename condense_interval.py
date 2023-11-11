@@ -48,7 +48,7 @@ class Synthesizer():
 
 
 
-    def init(self, loader, model, init_type='noise'):
+    def init(self, loader, init_type='noise'):
         """Condensed data initialization
         """
         
