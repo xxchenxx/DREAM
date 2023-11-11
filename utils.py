@@ -7,3 +7,4 @@ def get_strategy(name):
         return KMeansSampling
     else:
         raise NotImplementedError
+

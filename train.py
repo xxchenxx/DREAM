@@ -339,6 +339,50 @@ def save_checkpoint(save_dir, state, is_best):
     print("checkpoint saved! ", ckpt_path)
 
 
+def train_only(args, model, train_loader, return_weights=False, logger=None, epochs=None):
+    criterion = nn.CrossEntropyLoss().cuda()
+    optimizer = optim.SGD(model.parameters(),
+                          args.lr,
+                          momentum=args.momentum,
+                          weight_decay=args.weight_decay)
+    if epochs is None:
+        epochs = args.epochs
+    scheduler = optim.lr_scheduler.MultiStepLR(
+        optimizer, milestones=[2 * epochs // 3, 5 * epochs // 6], gamma=0.2)
+
+    # Load pretrained
+    cur_epoch, best_acc1, best_acc5, acc1, acc5 = 0, 0, 0, 0, 0
+    if args.pretrained:
+        pretrained = "{}/{}".format(args.save_dir, 'checkpoint.pth.tar')
+        cur_epoch, best_acc1 = load_checkpoint(pretrained, model, optimizer)
+        # TODO: optimizer scheduler steps
+
+    # model = torch.nn.DataParallel(model).cuda()
+    model = model.cuda()
+    if args.dsa:
+        aug = DiffAug(strategy=args.dsa_strategy, batch=False)
+        logger(f"Start training with DSA and {args.mixup} mixup")
+    else:
+        aug = None
+        logger(f"Start training with base augmentation and {args.mixup} mixup")
+
+    # Start training and validation
+    # print(get_time())
+    for epoch in range(cur_epoch + 1, int(epochs) + 1):
+        train_epoch(args,
+                    train_loader,
+                    model,
+                    criterion,
+                    optimizer,
+                    epoch,
+                    logger,
+                    aug,
+                    mixup=args.mixup)
+        scheduler.step()
+
+    return best_acc1, acc1, model.state_dict()
+
+
 if __name__ == '__main__':
     from misc.utils import Logger
     from argument import args

@@ -9,7 +9,7 @@ from data import transform_imagenet, transform_cifar, transform_svhn, transform_
 from data import TensorDataset, ImageFolder, save_img
 from data import ClassDataLoader, ClassMemDataLoader, MultiEpochsDataLoader
 from data import MEANS, STDS
-from train import define_model, train_epoch
+from train import define_model, train_epoch, train_only
 from test import test_data, load_ckpt, test_data_with_previous
 from misc.augment import DiffAug
 from misc import utils
