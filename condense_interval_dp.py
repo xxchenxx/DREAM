@@ -718,6 +718,7 @@ def condense(args, logger):
                         synset.module.data.grad.data.mul_(grad_mask)
                         
                     optim_img.step()
+                    torch.distributed.barrier()
                     ts.stamp("backward")
                 # Net update
                 if args.n_data > 0:
