@@ -659,7 +659,7 @@ def condense(args, logger):
         optim_img = torch.optim.SGD(synset.parameters(), lr=args.lr_img, momentum=args.mom_img)
 
         ts = utils.TimeStamp(args.time)
-        n_iter = args.niter * 100 // args.inner_loop // torch.cuda.device_count()
+        n_iter = args.niter * 100 // args.inner_loop // torch.distributed.get_world_size()
         it_log = n_iter // 200
         it_test = np.arange(0, n_iter+1, 40).tolist()
 
