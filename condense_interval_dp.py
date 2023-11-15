@@ -490,7 +490,7 @@ def condense(args, logger):
     labels_all = torch.tensor(labels_all, dtype=torch.long, device=device)
 
     if args.load_memory:
-        loader_real = ClassMemDataLoader(trainset, batch_size=args.batch_real, device=rank)
+        loader_real = ClassMemDataLoader(trainset, batch_size=args.batch_real, device=device)
     else:
         loader_real = ClassDataLoader(trainset,
                                       batch_size=args.batch_real,
@@ -498,7 +498,7 @@ def condense(args, logger):
                                       shuffle=True,
                                       pin_memory=True,
                                       drop_last=True,
-                                      rank=rank)
+                                      rank=device)
     nclass = trainset.nclass
     
     indices_class = [[] for c in range(nclass)]
@@ -535,7 +535,7 @@ def condense(args, logger):
                                       shuffle=True,
                                       pin_memory=True,
                                       drop_last=True)
-        synset = Synthesizer(args, nclass, nch, hs, ws, rank)
+        synset = Synthesizer(args, nclass, nch, hs, ws, device)
 
         model = define_model(args, nclass).to(device)
         model.eval()
@@ -544,13 +544,13 @@ def condense(args, logger):
                             momentum=args.momentum,
                             weight_decay=args.weight_decay)
         criterion = nn.CrossEntropyLoss()
-        aug, aug_rand = diffaug(args, rank)
+        aug, aug_rand = diffaug(args, device)
         # if rank == 0:
         if args.init == 'kmean':
             print("Kmean initialize synset")
             for c in range(synset.nclass):
                 img, _ = loader_real.class_sample(c, length_list[c])
-                strategy = NEW_Strategy(img, model, rank)
+                strategy = NEW_Strategy(img, model, device)
                 query_idxs= strategy.query(args.ipc)
                 synset.data.data[c*synset.ipc:(c+1)*synset.ipc] = img[query_idxs].detach().data
         elif args.init == 'random':
@@ -566,7 +566,7 @@ def condense(args, logger):
                     img = img.data.to(synset.device)
                 else:
                     img=img_class[c]
-                    strategy = NEW_Strategy(img, model, rank)
+                    strategy = NEW_Strategy(img, model, device)
                     query_idxs= strategy.query(synset.ipc * synset.factor**2)
                     img = img[query_idxs].detach()
                     img = img.data.to(synset.device)
@@ -592,7 +592,7 @@ def condense(args, logger):
         elif args.init == 'noise':
             pass
         
-        synset = synset.to(rank)
+        synset = synset.to(device)
         tdist.broadcast(synset.data.data, src=0)
         query_list=torch.tensor(np.ones(shape=(nclass,args.batch_real)), dtype=torch.long, requires_grad=False, device=device)
 
@@ -641,7 +641,7 @@ def condense(args, logger):
                 old_ipc = int(args.ipc)
                 new_ipc = old_ipc * (i + 1)
                 args.ipc = new_ipc
-                synset_old = Synthesizer(args, nclass, nch, hs, ws, rank)
+                synset_old = Synthesizer(args, nclass, nch, hs, ws, device)
                 synset_old.init(loader_real, init_type=args.init)
                 with torch.no_grad():
                     synset_old.data.copy_(prev_data)
@@ -693,17 +693,17 @@ def condense(args, logger):
 
                     if ot % args.interval == 0:
                         
-                        img=img_class[c].to(rank)
+                        img=img_class[c].to(device)
                         
-                        strategy = NEW_Strategy(img, model, rank)
+                        strategy = NEW_Strategy(img, model, device)
 
                         query_idxs= strategy.query(args.batch_real)
                         
                         query_list[c] = query_idxs
 
-                    images_all=img_class[c].to(rank)
+                    images_all=img_class[c].to(device)
                     img = images_all[query_list[c]]
-                    lab = torch.tensor([np.ones(img.size(0))*c], dtype=torch.long, requires_grad=False, device=rank).view(-1)
+                    lab = torch.tensor([np.ones(img.size(0))*c], dtype=torch.long, requires_grad=False, device=device).view(-1)
                     img_syn, lab_syn = synset.module.sample(c, max_size=args.batch_syn_max)
                     ts.stamp("data")
                     n = img.shape[0]
@@ -730,7 +730,7 @@ def condense(args, logger):
                                     n_data=args.n_data,
                                     aug=aug_rand,
                                     mixup=args.mixup_net,
-                                    rank=rank)
+                                    rank=device)
                 ts.stamp("net update")
 
                 if (ot + 1) % 10 == 0:
