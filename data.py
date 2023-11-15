@@ -420,8 +420,10 @@ class ClassDataLoader(MultiEpochsDataLoader):
     """Basic class loader (might be slow for processing data)
     """
     def __init__(self, *args, **kwargs):
+        rank = getattr(kwargs, 'rank', 0)
+        if 'rank' in kwargs:
+            del kwargs['rank']
         super().__init__(*args, **kwargs)
-
         self.nclass = self.dataset.nclass
         self.cls_idx = [[] for _ in range(self.nclass)]
         for i in range(len(self.dataset)):
@@ -431,7 +433,7 @@ class ClassDataLoader(MultiEpochsDataLoader):
         self.cls_targets = torch.tensor([np.ones(self.batch_size) * c for c in range(self.nclass)],
                                         dtype=torch.long,
                                         requires_grad=False,
-                                        device='cuda')
+                                        device=rank)
 
     def class_sample(self, c, ipc=-1):
         if ipc > 0:

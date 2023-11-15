@@ -1,10 +1,11 @@
 import torch
 from fast_pytorch_kmeans import KMeans
 class NEW_Strategy:
-    def __init__(self, images, net):
+    def __init__(self, images, net, rank):
         self.images = images
         self.net = net
-
+        self.rank = rank
+        self.net.to(rank)
     def euclidean_dist(self,x, y):
         m, n = x.size(0), y.size(0)
         xx = torch.pow(x, 2).sum(1, keepdim=True).expand(m, n)
@@ -18,7 +19,7 @@ class NEW_Strategy:
 
         embeddings = self.get_embeddings(self.images)
 
-        index = torch.arange(len(embeddings),device='cuda')
+        index = torch.arange(len(embeddings)).to(self.rank)
 
         kmeans = KMeans(n_clusters=n, mode='euclidean')
         labels = kmeans.fit_predict(embeddings)

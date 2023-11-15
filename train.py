@@ -175,7 +175,8 @@ def train_epoch(args,
                 logger=None,
                 aug=None,
                 mixup='vanilla',
-                n_data=-1):
+                n_data=-1,
+                rank=0):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -188,8 +189,8 @@ def train_epoch(args,
     num_exp = 0
     for i, (input, target) in enumerate(train_loader):
         if train_loader.device == 'cpu':
-            input = input.cuda()
-            target = target.cuda()
+            input = input.to(rank)
+            target = target.to(rank)
 
         data_time.update(time.time() - end)
 
@@ -201,7 +202,7 @@ def train_epoch(args,
         if r < args.mix_p and mixup == 'cut':
             # generate mixed sample
             lam = np.random.beta(args.beta, args.beta)
-            rand_index = random_indices(target, nclass=args.nclass)
+            rand_index = random_indices(target, nclass=args.nclass, device=rank)
 
             target_b = target[rand_index]
             bbx1, bby1, bbx2, bby2 = rand_bbox(input.size(), lam)
@@ -230,8 +231,8 @@ def train_epoch(args,
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
-
-        if i % args.print_freq == 0 and args.verbose == True:
+        
+        if i % args.print_freq == 0 and args.verbose == True and rank == 0:
             print('Epoch: [{0}/{1}][{2}/{3}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
@@ -251,7 +252,7 @@ def train_epoch(args,
         if (n_data > 0) and (num_exp >= n_data):
             break
 
-    if (epoch % args.epoch_print_freq == 0) and (logger is not None):
+    if (epoch % args.epoch_print_freq == 0) and (logger is not None) and rank == 0:
         logger(
             '(Train) [Epoch {0}/{1}] {2} Top1 {top1.avg:.1f}  Top5 {top5.avg:.1f}  Loss {loss.avg:.3f}'
             .format(epoch, args.epochs, get_time(), top1=top1, top5=top5, loss=losses))
