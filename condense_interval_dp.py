@@ -770,7 +770,7 @@ def condense(args, logger):
                 print("img and data saved!")
 
                 if not args.test:
-                    synset.test_with_previous(args, val_loader, prev_loaders, logger, bench=False)
+                    synset.module.test_with_previous(args, val_loader, prev_loaders, logger, bench=False)
     tdist.destroy_process_group()
 
 if __name__ == '__main__':
