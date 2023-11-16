@@ -1,7 +1,7 @@
 import torch
 from fast_pytorch_kmeans import KMeans
 class NEW_Strategy:
-    def __init__(self, images, net, rank):
+    def __init__(self, images, net, rank=0):
         self.images = images
         self.net = net
         self.rank = rank
