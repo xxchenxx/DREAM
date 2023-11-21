@@ -14,5 +14,6 @@ prev = f"results/cifar100/conv3in_iterative_increase_grad_mse_nd2000_cut_niter20
 prev = torch.load(prev)
 print(prev)
 
-for i in range(1, 25):
-    print((all_data[i] - prev).mean(1,2,3))
+for i in range(25):
+    for j in range(100):
+        assert (prev[0][j * 2 : (j + 1) * 2] - all_data[i][0][j * 4:j * 4 + 2]).mean() == 0
