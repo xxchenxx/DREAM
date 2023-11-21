@@ -493,7 +493,6 @@ def condense(args, logger, device='cuda'):
                                       batch_size=args.batch_real,
                                       num_workers=args.workers,
                                       shuffle=True,
-                                      pin_memory=True,
                                       drop_last=True)
     nclass = trainset.nclass
     
