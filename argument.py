@@ -271,6 +271,11 @@ parser.add_argument('--override-load-dir', type=str, default=None)
 parser.add_argument('--mixed-interval', action="store_true")
 parser.add_argument('--new_only', action="store_true")
 parser.add_argument('--last_only', action="store_true")
+
+parser.add_argument('--class_start', type=int, default=0)
+parser.add_argument('--class_end', type=int, default=100)
+
+
 parser.set_defaults(bottleneck=True)
 parser.set_defaults(verbose=False)
 args = parser.parse_args()

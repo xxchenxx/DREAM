@@ -518,7 +518,7 @@ def condense(args, logger, device='cuda'):
         previous_images = None
         previous_labels = None
 
-    for interval_idx in range(args.start_interval, args.num_intervals):
+    for interval_idx in range(args.start_interval, args.start_interval + 1):
         print("=" * 20)
         print(f"Begin interval: {interval_idx}")
         print("=" * 20)
@@ -667,6 +667,10 @@ def condense(args, logger, device='cuda'):
         model = define_model(args, nclass).to(device)
         model.train()
         print("There are {} files".format(len(filelist)))
+        if args.class_end - args.class_start != nclass:
+            split_mode = True
+        else:
+            split_mode = False
         from tqdm import tqdm
         for file in tqdm(filelist):
             loaded_checkpoints = torch.load(file)
@@ -687,7 +691,11 @@ def condense(args, logger, device='cuda'):
                 for ot in tqdm(range(args.inner_loop)):
                     ts.set()
                     # Update synset
-                    for c in range(nclass):
+                    if split_mode:
+                        iterations = range(args.class_start, args.class_end)
+                    else:
+                        iterations = range(nclass)
+                    for c in iterations:
 
                         if ot % args.interval == 0:
                             
@@ -732,7 +740,7 @@ def condense(args, logger, device='cuda'):
                 if (it + 1) in it_test:
                     previous_images = synset.data.data.clone()
                     previous_labels = synset.targets.data.clone()
-                    save_img(os.path.join(args.save_dir, f'img{it+1}.png'),
+                    save_img(os.path.join(args.save_dir, f'interval_{interval_idx}_img{it+1}_{args.class_start}_{args.start_end}.png'),
                             synset.data,
                             unnormalize=False,
                             dataname=args.dataset)
@@ -741,22 +749,22 @@ def condense(args, logger, device='cuda'):
                     # synset.data.data = torch.clamp(synset.data.data, min=0., max=1.)
                     torch.save(
                         [synset.data.detach().cpu(), synset.targets.cpu()],
-                        os.path.join(args.save_dir, f'data{it+1}.pt'))
+                        os.path.join(args.save_dir, f'data{it+1}_{interval_idx}_{args.class_start}_{args.start_end}.pt'))
                     print("img and data saved!")
 
                     if args.override_save_dir is not None:
                         os.makedirs(args.override_save_dir, exist_ok=True)
                         torch.save(
                             [synset.data.detach().cpu(), synset.targets.cpu()],
-                            os.path.join(args.override_save_dir, f'interval_{interval_idx}_data.pt'))
+                            os.path.join(args.override_save_dir, f'interval_{interval_idx}_data_{args.class_start}_{args.start_end}.pt'))
                     else:
                         torch.save(
                             [synset.data.detach().cpu(), synset.targets.cpu()],
-                            os.path.join(args.save_dir, f'interval_{interval_idx}_data.pt'))
+                            os.path.join(args.save_dir, f'interval_{interval_idx}_data_{args.class_start}_{args.start_end}.pt'))
                     print("img and data saved!")
 
-                    if not args.test:
-                        synset.test_with_previous(args, val_loader, prev_loaders, logger, bench=False)
+                    # if not args.test:
+                    #     synset.test_with_previous(args, val_loader, prev_loaders, logger, bench=False)
 
 if __name__ == '__main__':
     import shutil
