@@ -18,7 +18,7 @@ print(all_data[i][0])
 combined = [] 
 for i in range(25):
     print(i)
-    combined.append(all_data[i][0][ipc * i : ipc * (i+1)])
+    combined.append(all_data[i][0][ipc * (i*4) : ipc * (i+1) * 4])
 combined = torch.cat(combined, dim=0)
 print(combined.shape)
 label = all_data[0][1]
