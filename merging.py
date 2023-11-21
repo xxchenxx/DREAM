@@ -19,4 +19,4 @@ for i in range(25):
     print(i)
     for j in range(100):
         print(j)
-        print(prev[0][j * 2 : (j + 1) * 2] - all_data[i][0][j * 4:j * 4 + 2])
+        print(prev[0][j*2+1] - all_data[i][0][j * 4+2])
