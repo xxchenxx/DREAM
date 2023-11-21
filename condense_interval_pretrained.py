@@ -666,9 +666,12 @@ def condense(args, logger, device='cuda'):
         it = 0
         model = define_model(args, nclass).to(device)
         model.train()
+        print("There are {} files".format(len(filelist)))
         while len(filelist) > 0:
             loaded_checkpoints = torch.load(filelist[0])
             filelist = filelist[1:]
+            print("There are {} checkpoints".format(len(loaded_checkpoints)))
+
             for i in range(len(loaded_checkpoints)):
                 model.load_state_dict(loaded_checkpoints[i][0])
             
