@@ -260,6 +260,7 @@ parser.add_argument('--same_compute',
                     help='match evaluation training steps for IDC')
 parser.add_argument('--name', type=str, default='', help='name of the test data folder')
 parser.add_argument('--start-interval', type=int, default=0)
+parser.add_argument('--unique', type=int, default=0)
 parser.add_argument('--difficulty-interval', type=int, default=10)
 parser.add_argument('--filter-easy-to-hard', action='store_true')
 parser.add_argument('--filter-correct-samples', action='store_true')
