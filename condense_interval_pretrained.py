@@ -740,7 +740,7 @@ def condense(args, logger, device='cuda'):
                 if (it + 1) in it_test:
                     previous_images = synset.data.data.clone()
                     previous_labels = synset.targets.data.clone()
-                    save_img(os.path.join(args.save_dir, f'interval_{interval_idx}_img{it+1}_{args.class_start}_{args.start_end}.png'),
+                    save_img(os.path.join(args.save_dir, f'interval_{interval_idx}_img{it+1}_{args.class_start}_{args.class_end}.png'),
                             synset.data,
                             unnormalize=False,
                             dataname=args.dataset)
@@ -749,18 +749,18 @@ def condense(args, logger, device='cuda'):
                     # synset.data.data = torch.clamp(synset.data.data, min=0., max=1.)
                     torch.save(
                         [synset.data.detach().cpu(), synset.targets.cpu()],
-                        os.path.join(args.save_dir, f'data{it+1}_{interval_idx}_{args.class_start}_{args.start_end}.pt'))
+                        os.path.join(args.save_dir, f'data{it+1}_{interval_idx}_{args.class_start}_{args.class_end}.pt'))
                     print("img and data saved!")
 
                     if args.override_save_dir is not None:
                         os.makedirs(args.override_save_dir, exist_ok=True)
                         torch.save(
                             [synset.data.detach().cpu(), synset.targets.cpu()],
-                            os.path.join(args.override_save_dir, f'interval_{interval_idx}_data_{args.class_start}_{args.start_end}.pt'))
+                            os.path.join(args.override_save_dir, f'interval_{interval_idx}_data_{args.class_start}_{args.class_end}.pt'))
                     else:
                         torch.save(
                             [synset.data.detach().cpu(), synset.targets.cpu()],
-                            os.path.join(args.save_dir, f'interval_{interval_idx}_data_{args.class_start}_{args.start_end}.pt'))
+                            os.path.join(args.save_dir, f'interval_{interval_idx}_data_{args.class_start}_{args.class_end}.pt'))
                     print("img and data saved!")
 
                     # if not args.test:
