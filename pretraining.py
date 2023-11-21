@@ -647,7 +647,7 @@ def condense(args, logger, device='cuda'):
         from tqdm import tqdm
         for it in tqdm(range(n_iter)):
             trajectories = []
-            if it % args.fix_iter == 0 and it != 0:
+            if True:
                 model = define_model(args, nclass).to(device)
                 model.train()
                 if interval_idx > 0:
@@ -682,13 +682,14 @@ def condense(args, logger, device='cuda'):
                         trajectories.append(model.state_dict())
                 ts.stamp("net update")
 
-                if (ot + 1) % 10 == 0:
-                    ts.flush()
+                
             all_trajectories.append(trajectories)
+            if len(all_trajectories) == 20:
+                torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}_{it}.pt'))
+                all_trajectories = []
             
-        torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}.pt'))
-
-            # Logging
+        torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}_{it}.pt'))
+        all_trajectories = []
 
 if __name__ == '__main__':
     import shutil
