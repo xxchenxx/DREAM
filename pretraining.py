@@ -685,9 +685,9 @@ def condense(args, logger, device='cuda'):
                 if (ot + 1) % 10 == 0:
                     ts.flush()
             all_trajectories.append(trajectories)
-            if len(all_trajectories) == 100:
-                torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{it}_{args.unique}.pt'))
-                all_trajectories = []
+            
+        torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}.pt'))
+
             # Logging
 
 if __name__ == '__main__':

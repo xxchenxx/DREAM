@@ -477,4 +477,4 @@ else:
 if args.override_load_dir is not None:
     args.save_dir = args.override_load_dir
 
-args.niter = args.niter / args.num_runs
+args.niter = args.niter // args.num_runs
