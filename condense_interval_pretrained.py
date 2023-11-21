@@ -678,7 +678,7 @@ def condense(args, logger, device='cuda'):
 
             for i in tqdm(range(len(loaded_checkpoints))):
                 model.load_state_dict(loaded_checkpoints[i][0])
-            
+                it += 1
                 optim_net = optim.SGD(model.parameters(),
                                         args.lr,
                                         momentum=args.momentum,
