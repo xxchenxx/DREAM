@@ -635,7 +635,7 @@ def condense(args, logger, device='cuda'):
                 prev_loaders.append(prev_loader)
                 args.ipc = old_ipc
 
-        args.niter = 1000 // args.num_runs
+        args.niter = 2000 // args.num_runs
         ts = utils.TimeStamp(args.time)
         n_iter = args.niter * 100 // args.inner_loop
         it_log = n_iter // 200
