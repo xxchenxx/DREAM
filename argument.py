@@ -262,6 +262,7 @@ parser.add_argument('--name', type=str, default='', help='name of the test data 
 parser.add_argument('--start-interval', type=int, default=0)
 parser.add_argument('--unique', type=int, default=0)
 parser.add_argument('--difficulty-interval', type=int, default=10)
+parser.add_argument('--num_runs', type=int, default=1)
 parser.add_argument('--filter-easy-to-hard', action='store_true')
 parser.add_argument('--filter-correct-samples', action='store_true')
 parser.add_argument('--filter-correct-samples-both', action='store_true')
@@ -475,3 +476,5 @@ else:
 
 if args.override_load_dir is not None:
     args.save_dir = args.override_load_dir
+
+args.niter = args.niter / args.num_runs
