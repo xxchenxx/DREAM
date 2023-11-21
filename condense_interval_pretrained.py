@@ -645,8 +645,8 @@ def condense(args, logger, device='cuda'):
                 args.ipc = old_ipc
 
         print("condense begin")
-        if not args.test:
-            synset.test_with_previous(args, val_loader, prev_loaders, logger, bench=False)
+        # if not args.test:
+        #     synset.test_with_previous(args, val_loader, prev_loaders, logger, bench=False)
         
         # Data distillation
         optim_img = torch.optim.SGD(synset.parameters(), lr=args.lr_img, momentum=args.mom_img)
@@ -684,7 +684,7 @@ def condense(args, logger, device='cuda'):
                 loss_total = 0
                 
                 synset.data.data = torch.clamp(synset.data.data, min=0., max=1.)
-                for ot in range(args.inner_loop):
+                for ot in tqdm(range(args.inner_loop)):
                     ts.set()
                     # Update synset
                     for c in range(nclass):
