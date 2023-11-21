@@ -687,9 +687,9 @@ def condense(args, logger, device='cuda'):
             if len(all_trajectories) == 20:
                 torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}_{it}.pt'))
                 all_trajectories = []
-            
-        torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}_{it}.pt'))
-        all_trajectories = []
+        if len(all_trajectories) > 0:
+            torch.save(all_trajectories, os.path.join(args.save_dir, f'interval_{interval_idx}_trajectories_{args.unique}_{it}.pt'))
+            all_trajectories = []
 
 if __name__ == '__main__':
     import shutil
