@@ -672,7 +672,7 @@ def condense(args, logger, device='cuda'):
         else:
             split_mode = False
         from tqdm import tqdm
-        for file in tqdm(filelist[:25]):
+        for file in tqdm(filelist[:50]):
             loaded_checkpoints = torch.load(file)
             print("There are {} checkpoints".format(len(loaded_checkpoints)))
 
